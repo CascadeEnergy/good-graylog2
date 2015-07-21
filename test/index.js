@@ -1,52 +1,64 @@
-var Stream = require('stream');
+'use strict';
+
 var assert = require('assert');
-var should = require('should');
 var proxyquire = require('proxyquire');
+var Readable = require('stream').Readable;
 
+var GraylogReporter = proxyquire('../', {graylog2: {graylog: graylog}});
 
-var graylog = {
+function readStream() {
+  var stream = new Readable({ objectMode: true });
+  stream._read = function() {};
+  return stream;
+}
 
-};
-var goodGraylog2 = proxyquire('../index', {graylog2: graylog});
-
+function graylog() {}
 
 describe('good-graylog2', function() {
-  var config = {
-    host: 'graylog2.example.com',
-    port: 1234,
-    service: 'test-service',
-    docker : true,
-    container: '1234abcd'
-  };
-  var readStream = function () {
-    return new Stream.Readable({ objectMode: true });
-  };
+  it('should send log events with graylog.info', function(done) {
+    var infoLog = {
+      event     : 'log',
+      timestamp : 1396207735000,
+      tags      : ['info', 'server'],
+      data      : 'Log message',
+      pid       : 1234
+    };
 
-  it('should create a graylog client', function(done) {
-    var goodReporter = new goodGraylog2(null,config);
-    should.exist(goodReporter.client);
-    done();
-  });
-
-  it('should log an event', function(done) {
-    var goodReporter = new goodGraylog2({log: '*'}, config);
+    var reporter = new GraylogReporter({log: '*'}, {});
     var stream = readStream();
 
-    goodReporter.client.log = function(short_message) {
-      assert.equal(short_message, 'log data');
+    reporter.client.info = function(message) {
+      assert.equal(message, infoLog);
       done();
     };
 
-    goodReporter._report('log data');
+    reporter.init(stream, null, function() {
+      stream.push(infoLog);
+    });
   });
 
-  it('should init', function(done) {
-    var goodReporter = new goodGraylog2({log: '*'}, config);
+  it('should send error events with graylog.error', function(done) {
+    var errorLog = {
+      event     : 'error',
+      timestamp : 1396207735000,
+      tags      : ['error', 'server'],
+      data      : 'Log message',
+      pid       : 1234
+    };
+
+    // Branch coverage.
+    var config = { container: 'test.container'};
+
+    var reporter = new GraylogReporter({error: '*'}, config);
     var stream = readStream();
 
-    goodReporter.init(stream, null, function(err) {
-      should.not.exist(err);
+    reporter.client.error = function(message) {
+      assert.equal(message, errorLog);
       done();
+    };
+
+    reporter.init(stream, null, function() {
+      stream.push(errorLog);
     });
-  })
+  });
 });

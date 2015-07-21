@@ -1,31 +1,31 @@
+'use strict';
+
 var graylog2 = require('graylog2');
-var goodSqueeze = require('good-squeeze');
+var Squeeze = require('good-squeeze').Squeeze;
 
-var reporter = {};
-
-module.exports = reporter.GraylogReporter = function (events, config) {
+function GraylogReporter(events, config) {
   this.client = new graylog2.graylog({
-    servers: [
-      {'host' : config.host, port: config.port}
-    ],
-    facility: config.service
+    servers: [{ host : config.host, port: config.port }],
+    facility: config.service,
+    hostname: (config.container) ? config.container : undefined
   });
 
-  if(config.docker) {
-    this.client.hostname = config.container;
-  }
+  this.squeeze = new Squeeze(events);
+}
 
-  this.streams = {
-    squeeze: goodSqueeze.Squeeze(events)
-  };
-};
-
-reporter.GraylogReporter.prototype.init = function(readstream, emitter, callback) {
-  this.streams.squeeze.on('data', this._report.bind(this));
-  readstream.pipe(this.streams.squeeze);
+GraylogReporter.prototype.init = function(readstream, emitter, callback) {
+  this.squeeze.on('data', this._report.bind(this));
+  readstream.pipe(this.squeeze);
   callback();
 };
 
-reporter.GraylogReporter.prototype._report = function(report) {
-  this.client.log(report);
+GraylogReporter.prototype._report = function(report) {
+  if (report.event === 'error') {
+    this.client.error(report);
+    return;
+  }
+
+  this.client.info(report);
 };
+
+module.exports = GraylogReporter;

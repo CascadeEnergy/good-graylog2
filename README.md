@@ -27,7 +27,8 @@ server.route([
     handler: function(request, reply) {
       reply('OK');
     }
-  }]);
+  }
+]);
 
 var hapiOptions = {
   reporters: [
@@ -42,23 +43,21 @@ var hapiOptions = {
         service: 'service-name',
         host: 'graylog.example.com',
         port: '1234',
-        docker: true, // if true, must supply full container id in the `container` field
-        container: config.container //required if docker: true
+        container: config.container // optional
       }
     }
-  ]
+  ],
+  responsePayload: true
 };
 
 server.register({ register: good, options: hapiOptions}, function(err) {
   if(err) {
     server.log(['service-name', 'error'], err);
-  }
-  else {
+  } else {
     server.start(function() {
       server.log(['service-name', 'info'], 'service-name running at: ' + server.info.uri);
     });
   }
-});
 });
 ```
 
