@@ -1,5 +1,5 @@
 # good-graylog2
-Good reporter for graylog2
+_Good Reporter For Graylog2_
 
 ## Usage:
 
