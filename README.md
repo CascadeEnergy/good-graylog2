@@ -2,7 +2,9 @@
 _Good Reporter For Graylog2_
 
 __Hapi:__ http://hapijs.com/
+
 __Good:__ https://github.com/hapijs/good
+
 __Graylog2:__ https://www.graylog.org/
 
 
