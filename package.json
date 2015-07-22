@@ -23,6 +23,7 @@
     }
   ],
   "license": "MIT",
+  "keywords" : ["hapi","hapijs","graylog","graylog2","good","reporter","logging","logger"],
   "bugs": {
     "url": "https://github.com/cascadeenergy/good-graylog2/issues"
   },

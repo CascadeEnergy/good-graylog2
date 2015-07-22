@@ -47,7 +47,7 @@ describe('good-graylog2', function() {
     };
 
     // Branch coverage.
-    var config = { container: 'test.container'};
+    var config = { hostname: 'test.container'};
 
     var reporter = new GraylogReporter({error: '*'}, config);
     var stream = readStream();

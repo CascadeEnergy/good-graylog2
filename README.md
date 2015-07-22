@@ -1,6 +1,12 @@
 # good-graylog2
 Good reporter for graylog2
 
+__Hapi:__ http://hapijs.com/
+__Good:__ https://github.com/hapijs/good
+__Graylog2:__ https://www.graylog.org/
+
+
+
 ## Usage:
 
 ```
@@ -8,9 +14,7 @@ Good reporter for graylog2
 
 var Hapi = require('hapi');
 var good = require('good');
-var goodConsole = require('good-console');
-var graylogReporter = require('good-graylog2');
-var config = require('config');
+var GoodGraylog2 = require('good-graylog2');
 
 var server = new Hapi.Server();
 
@@ -30,10 +34,10 @@ server.route([
   }
 ]);
 
-var hapiOptions = {
+var goodOptions = {
   reporters: [
     {
-      reporter: graylogReporter,
+      reporter: GoodGraylog2,
       events: {
         response: '*',
         log: '*',
@@ -43,14 +47,14 @@ var hapiOptions = {
         service: 'service-name',
         host: 'graylog.example.com',
         port: '1234',
-        container: config.container // optional
+        //hostname: 'myContainerId' //optional 
       }
     }
   ],
   responsePayload: true
 };
 
-server.register({ register: good, options: hapiOptions}, function(err) {
+server.register({ register: good, options: goodOptions}, function(err) {
   if(err) {
     server.log(['service-name', 'error'], err);
   } else {

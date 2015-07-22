@@ -7,7 +7,7 @@ function GraylogReporter(events, config) {
   this.client = new graylog2.graylog({
     servers: [{ host : config.host, port: config.port }],
     facility: config.service,
-    hostname: (config.container) ? config.container : undefined
+    hostname: (config.hostname) ? config.hostname : undefined
   });
 
   this.squeeze = new Squeeze(events);
